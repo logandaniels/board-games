@@ -1,16 +1,27 @@
 "use strict";
 
-var canvas = document.getElementById("myCanvas");
-var ctx = canvas.getContext("2d");
+createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
+createjs.Ticker.framerate = 30;
+createjs.Ticker.addEventListener("tick", update);
 
-var card = new Card(60, 50);
-function draw(timestamp) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+var stage = null;
+var circle = null;
 
-    card.draw(ctx);
+var dx = 2;
+
+// Returns a random integer between min (included) and max (excluded)
+// Using Math.round() will give you a non-uniform distribution!
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+}
 
 
-    window.requestAnimationFrame(draw);
+function update(e) {
+    circle.x += dx;
+    if (circle.x >= stage.canvas.width - 50 || circle.x <= 0) {
+        dx *= -1;
+    }
+    stage.update();
 }
 
 function keyDownHandler(e) {
@@ -20,11 +31,22 @@ function keyUpHandler(e) {
 }
 
 function mouseHandler(e) {
-    var relativeX = e.clientX - canvas.offsetLeft;
 }
 
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 document.addEventListener("mousemove", mouseHandler, false);
 
-window.requestAnimationFrame(draw);
+function initCanvas() {
+    stage = new createjs.Stage("myCanvas");
+    circle = new createjs.Shape();
+    circle.graphics.beginFill("Blue").drawCircle(0, 0, 50);
+    circle.x = 100;
+    circle.y = 100;
+    stage.addChild(circle);
+    stage.addChild(cards[getRandomInt(0, cards.length)]);
+    circle.addEventListener("click", e => {
+        circle.graphics.beginFill("Red").drawCircle(0, 0, 50);
+    });
+    stage.update();
+}
