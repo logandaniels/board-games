@@ -1,7 +1,7 @@
 "use strict";
 
 var data = {
-    images: ["img/cards.gif"],
+    images: ["img/cards.png"],
     frames: {
         width: 81,
         height: 117
@@ -12,7 +12,7 @@ var sheet = new createjs.SpriteSheet(data);
 var sprite = new createjs.Sprite(sheet);
 
 var cardsImage = new Image();
-cardsImage.src = "img/cards.gif";
+cardsImage.src = "img/cards.png";
 
 //var CARD = {}
 //
@@ -61,15 +61,25 @@ function drawCard(cards) {
 }
 
 function dragMouseDownHandler(e) {
+    e.nativeEvent.preventDefault();
     var card = e.target;
-    stage.setChildIndex(card, stage.children.length - 1);
-    card.lastTouched = Date.now();
-    card.lastDragX = e.stageX;
-    card.lastDragY = e.stageY;
+    socket.emit('tryDrag', {id: card.name}, function (canDrag) {
+        console.log("canDrag: " + canDrag);
+        if (canDrag) {
+            stage.setChildIndex(card, stage.children.length - 1);
+            card.dragging = true;
+            card.lastDragX = e.stageX;
+            card.lastDragY = e.stageY;
+        }
+    });
 }
 
 function dragPressMoveHandler(e) {
+    e.nativeEvent.preventDefault();
     var card = e.target;
+    if (!card.dragging) {
+        return;
+    }
     card.x += e.stageX - card.lastDragX;
     card.y += e.stageY - card.lastDragY;
     card.lastDragX = e.stageX;
@@ -77,8 +87,14 @@ function dragPressMoveHandler(e) {
 }
 
 function cardMouseUpHandler(e) {
+    e.nativeEvent.preventDefault();
     var card = e.target;
+    if (!card.dragging) {
+        return;
+    }
     trySnap(card);
+    card.dragging = false;
+    socket.emit('endDrag', {id: card.name});
     sendObjectUpdate(card.name, card.x, card.y);
 }
 

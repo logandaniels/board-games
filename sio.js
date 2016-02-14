@@ -7,9 +7,10 @@ var sio = {};
 var id = 0;
 
 var newBitmapData = {
-    imgPath: "img/cards.gif",
+    imgPath: "img/cards.png",
     imgX: 0, imgY: 0,
     imgWidth: 81, imgHeight: 117,
+    interacting: false,
     id: id++
 };
 
@@ -38,11 +39,12 @@ sio.init = function (server) {
         socket.on('spawnDeck', function () {
             console.log("Spawning deck");
             var deck = {
-                imgPath: "img/cards.gif",
+                imgPath: "img/cards.png",
                 imgX: 0, imgY: 117 * 4,
                 imgWidth: 81, imgHeight: 117,
                 x: 50, y: 50,
                 cards: [],
+                interacting: false,
                 id: id++
             };
 
@@ -51,9 +53,10 @@ sio.init = function (server) {
                 for (var j = 0; j < 13; j++) {
                     var card = {};
                     card = {
-                        imgPath: "img/cards.gif",
+                        imgPath: "img/cards.png",
                         imgX: j * 81, imgY: i * 117,
                         imgWidth: 81, imgHeight: 117,
+                        interacting: false,
                         id: id++
                     };
                     gameObjects[card.id] = card;
@@ -78,6 +81,20 @@ sio.init = function (server) {
             deck.cards.splice(index, 1);
             io.emit('createBitmap', card);
         });
+
+        socket.on('tryDrag', function (data, cb) {
+            var obj = gameObjects[data['id']];
+            var canDrag = !obj.interacting;
+            if (canDrag) {
+                obj.interacting = true;
+            }
+            cb(canDrag);
+        });
+        socket.on('endDrag', function (data, cb) {
+            var obj = gameObjects[data['id']];
+            obj.interacting = false;
+        });
+
     });
 
 

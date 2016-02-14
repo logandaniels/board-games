@@ -44,8 +44,17 @@ function initCanvas() {
     createjs.Ticker.framerate = 30;
     createjs.Ticker.addEventListener("tick", update);
 
+
     stage = new createjs.Stage("myCanvas");
     resize();
+
+    createjs.Touch.enable(stage);
+
+    stage.preventSelection = true;
+
+    stage.on("click", function (e) {
+        e.nativeEvent.preventDefault();
+    });
 
     //stage.addChild(deck);
     //deck.x = 300;
