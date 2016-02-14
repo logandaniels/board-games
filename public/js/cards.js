@@ -45,9 +45,9 @@ snaps.push(snapLocation);
 
 var cards = [];
 
-var deck = new createjs.Bitmap(cardsImage);
-deck.sourceRect = {x: 0, y: 117 * 4, width: 81, height: 117};
-deck.on("click", deckClickHandler);
+//var deck = new createjs.Bitmap(cardsImage);
+//deck.sourceRect = {x: 0, y: 117 * 4, width: 81, height: 117};
+//deck.on("click", deckClickHandler);
 
 function drawCard(cards) {
     if (cards.length == 0) {
@@ -79,6 +79,7 @@ function dragPressMoveHandler(e) {
 function cardMouseUpHandler(e) {
     var card = e.target;
     trySnap(card);
+    sendObjectUpdate(card.name, card.x, card.y);
 }
 
 function between(val, lbound, rbound) {
@@ -101,6 +102,15 @@ function trySnap(card) {
 }
 
 function deckClickHandler(e) {
+    console.log("Deck was clicked");
+    var deck = e.target;
+    var data = {
+        id: deck.name
+    }
+    socket.emit('deckClick', data);
+}
+
+function deckClickHandler2(e) {
     var deck = e.target;
     var newCard = drawCard(cards);
     if (newCard === null) {

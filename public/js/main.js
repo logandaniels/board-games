@@ -4,6 +4,7 @@ window.addEventListener("resize", resize, false);
 
 var stage = null;
 var circle = null;
+var images = [];
 
 var dx = 2;
 
@@ -46,9 +47,9 @@ function initCanvas() {
     stage = new createjs.Stage("myCanvas");
     resize();
 
-    stage.addChild(deck);
-    deck.x = 300;
-    deck.y = 300;
+    //stage.addChild(deck);
+    //deck.x = 300;
+    //deck.y = 300;
 
     stage.addChild(snapLocation);
     snapLocation.x = 600;
@@ -64,12 +65,12 @@ function initCanvas() {
     });
     stage.addChild(circle);
 
-    stage.addChild(drawCard(cards));
-
+    //stage.addChild(drawCard(cards));
+    initSocket();
     stage.update();
 }
 
 function resize() {
     stage.canvas.width = window.innerWidth;
-    stage.canvas.height = window.innerHeight;
+    stage.canvas.height = window.innerHeight * 0.8;
 }

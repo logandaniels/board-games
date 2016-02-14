@@ -44,9 +44,13 @@
     <canvas id="myCanvas"></canvas>
 </div>
 
-<form action="">
+<form id="sendMessage" action="">
     <input id="m" autocomplete="off"/>
     <button>Send</button>
+</form>
+
+<form id="spawnDeck">
+    <button>Spawn deck</button>
 </form>
 
 <script src="https://code.createjs.com/createjs-2015.11.26.combined.js "></script>
@@ -57,14 +61,7 @@
 <script src="js/compiled/main.js"></script>
 
 <script src="/socket.io/socket.io.js"></script>
-<script>
-    var socket = io();
-    $('form').submit(function () {
-        socket.emit('chat message', $('#m').val());
-        $('#m').val('');
-        return false;
-    });
-</script>
+<script src="js/client.js"></script>
 
 
 <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
