@@ -3,6 +3,15 @@
 var app = require('./app');
 var http = require('http').createServer(app);
 
+var Grid = {};
+
+Grid.convertX = function (x) {
+    return x / 1066;
+};
+Grid.convertY = function (y) {
+    return y / 600;
+};
+
 var sio = {};
 var id = 0;
 
@@ -10,6 +19,8 @@ var newBitmapData = {
     imgPath: "img/cards.png",
     imgX: 0, imgY: 0,
     imgWidth: 81, imgHeight: 117,
+    gridX: 0, gridY: 0,
+    gridWidth: Grid.convertX(81), gridHeight: Grid.convertY(117),
     interacting: false,
     id: id++
 };
@@ -42,7 +53,8 @@ sio.init = function (server) {
                 imgPath: "img/cards.png",
                 imgX: 0, imgY: 117 * 4,
                 imgWidth: 81, imgHeight: 117,
-                x: 50, y: 50,
+                gridX: .2, gridY: .2,
+                gridWidth: Grid.convertX(81), gridHeight: Grid.convertY(117),
                 cards: [],
                 interacting: false,
                 id: id++
@@ -56,6 +68,7 @@ sio.init = function (server) {
                         imgPath: "img/cards.png",
                         imgX: j * 81, imgY: i * 117,
                         imgWidth: 81, imgHeight: 117,
+                        gridWidth: Grid.convertX(81), gridHeight: Grid.convertY(117),
                         interacting: false,
                         id: id++
                     };
@@ -76,8 +89,8 @@ sio.init = function (server) {
             }
             var index = getRandomInt(0, deck.cards.length);
             var card = deck.cards[index];
-            card.x = deck.x + deck.imgWidth;
-            card.y = deck.y;
+            card.gridX = deck.gridX + Grid.convertX(deck.imgWidth);
+            card.gridY = deck.gridY;
             deck.cards.splice(index, 1);
             io.emit('createBitmap', card);
         });
@@ -97,8 +110,8 @@ sio.init = function (server) {
 
     });
 
+};
 
-}
 
 // [From MDN] Returns a random integer between min (included) and max (excluded).
 // Using Math.round() will give you a non-uniform distribution!

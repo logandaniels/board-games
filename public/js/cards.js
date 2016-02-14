@@ -68,8 +68,9 @@ function dragMouseDownHandler(e) {
         if (canDrag) {
             stage.setChildIndex(card, stage.children.length - 1);
             card.dragging = true;
-            card.lastDragX = e.stageX;
-            card.lastDragY = e.stageY;
+            var eventCoords = Grid.pixelToCoord(e.stageX, e.stageY);
+            card.lastDragX = eventCoords.x;
+            card.lastDragY = eventCoords.y;
         }
     });
 }
@@ -80,10 +81,12 @@ function dragPressMoveHandler(e) {
     if (!card.dragging) {
         return;
     }
-    card.x += e.stageX - card.lastDragX;
-    card.y += e.stageY - card.lastDragY;
-    card.lastDragX = e.stageX;
-    card.lastDragY = e.stageY;
+    var eventCoords = Grid.pixelToCoord(e.stageX, e.stageY);
+    card.gridX += eventCoords.x - card.lastDragX;
+    card.gridY += eventCoords.y - card.lastDragY;
+    Grid.scaleAndPositionBitmap(card);
+    card.lastDragX = eventCoords.x;
+    card.lastDragY = eventCoords.y;
 }
 
 function cardMouseUpHandler(e) {
@@ -95,7 +98,7 @@ function cardMouseUpHandler(e) {
     trySnap(card);
     card.dragging = false;
     socket.emit('endDrag', {id: card.name});
-    sendObjectUpdate(card.name, card.x, card.y);
+    sendObjectUpdate(card.name, card.gridX, card.gridY);
 }
 
 function between(val, lbound, rbound) {

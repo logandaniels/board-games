@@ -1,6 +1,8 @@
 "use strict";
 
 window.addEventListener("resize", resize, false);
+window.addEventListener("orientationchange", resize, false);
+
 
 var stage = null;
 var circle = null;
@@ -16,12 +18,6 @@ function getRandomInt(min, max) {
 
 
 function update(e) {
-    circle.x += dx;
-    if (circle.x >= stage.canvas.width - 50 || circle.x <= 0) {
-        dx *= -1;
-    }
-
-
     stage.update();
 }
 
@@ -48,6 +44,12 @@ function initCanvas() {
     stage = new createjs.Stage("myCanvas");
     resize();
 
+    var fill = new createjs.Shape();
+    fill.graphics.beginFill("white").drawRect(0, 0, stage.canvas.width, stage.canvas.height);
+    fill.name = "bg";
+
+    stage.addChild(fill);
+
     createjs.Touch.enable(stage);
 
     stage.preventSelection = true;
@@ -60,19 +62,9 @@ function initCanvas() {
     //deck.x = 300;
     //deck.y = 300;
 
-    stage.addChild(snapLocation);
-    snapLocation.x = 600;
-    snapLocation.y = 300;
-
-
-    circle = new createjs.Shape();
-    circle.graphics.beginFill("Blue").drawCircle(0, 0, 50);
-    circle.x = 100;
-    circle.y = 100;
-    circle.addEventListener("click", e => {
-        circle.graphics.beginFill("Red").drawCircle(0, 0, 50);
-    });
-    stage.addChild(circle);
+    //stage.addChild(snapLocation);
+    //snapLocation.x = 600;
+    //snapLocation.y = 300;
 
     //stage.addChild(drawCard(cards));
     initSocket();
@@ -80,6 +72,22 @@ function initCanvas() {
 }
 
 function resize() {
-    stage.canvas.width = window.innerWidth;
-    stage.canvas.height = window.innerHeight * 0.8;
+    console.log("resizing");
+    // Resize to a 16:9 resolution
+    if (window.innerWidth < window.innerHeight) {
+        stage.canvas.width = window.innerWidth;
+        stage.canvas.height = 9.0 / 16.0 * window.innerWidth;
+    } else {
+        stage.canvas.width = 16.0 / 9.0 * window.innerHeight;
+        stage.canvas.height = window.innerHeight;
+    }
+
+    for (var i = 0; i < stage.children.length; i++) {
+        var child = stage.children[i];
+        if (child.name === "bg") {
+            child.graphics.clear().beginFill("white").drawRect(0, 0, stage.canvas.width, stage.canvas.height);
+        } else {
+            Grid.scaleAndPositionBitmap(child);
+        }
+    }
 }
